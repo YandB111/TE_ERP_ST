@@ -3,6 +3,18 @@ const router = express.Router();
 const Student = require('../models/student');
 const bodyParser = require('body-parser');
 
+function generateStudentCode(studentId) {
+  // Assuming studentId is a number
+  // Pad the student ID with leading zeros to make it at least 2 digits long
+  const paddedId = studentId.toString().padStart(2, '0');
+
+  // Create the student code by concatenating "SOO" and the padded ID
+  const studentCode = `SOO${paddedId}`;
+
+  return studentCode;
+}
+
+
 /**
  * @swagger
  * /api/student/create:
@@ -62,6 +74,12 @@ router.post('/create', async (req, res) => {
     const student = new Student(studentData);
 
     // Save the student to the database
+    await student.save();
+
+    // Generate the student code based on their ID
+    student.STUDENT_CODE = generateStudentCode(student._id);
+
+    // Save the updated student with the generated code
     await student.save();
 
     res.json(student);
